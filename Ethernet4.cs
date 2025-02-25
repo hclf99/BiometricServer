@@ -23,7 +23,7 @@ using VALUELib;
 
 namespace BiometricServer
 {
-    public class CS1
+    public class CS4
     {
         private readonly object lockMessageSend = new object();
         private ConcurrentQueue<string> S_Request = new ConcurrentQueue<string>();
@@ -35,7 +35,6 @@ namespace BiometricServer
         public bool IsStopped { get; private set; } = false;
         private SQLiteConnection conn;
 
-        private TcpClient _clientInterface = null;
         private TcpListener tcpListener;
 
         //----------------------------------------------------------------
@@ -55,7 +54,7 @@ namespace BiometricServer
         {
             // TCP/IP SERVER CHANNEL = Event processing from DB-Matik
 
-            LogManager.DefaultLogger.Info("[TCPIP -> Server1] stopping Listener 1");
+            LogManager.DefaultLogger.Info("TCPIP -> Server4] stopping Listener 4");
 
             if (tcpListener != null)
             {
@@ -72,9 +71,9 @@ namespace BiometricServer
             WorkerThread = new Thread(new ThreadStart(Worker));
             WorkerThread.Start();
 
-            int port = int.Parse(ReadSetting("SERVER_PORT1"));
+            int port = int.Parse(ReadSetting("SERVER_PORT4"));
 
-            LogManager.DefaultLogger.Info("[TCPIP -> Server1] starting Listener on Port: " + port.ToString());
+            LogManager.DefaultLogger.Info("TCPIP -> Server4] starting Listener on Port: " + port.ToString());
 
             tcpListener = new TcpListener(IPAddress.Any, port);
             
@@ -84,7 +83,7 @@ namespace BiometricServer
             }
             catch (Exception ex)
             {
-                LogManager.DefaultLogger.Error("[TCPIP -> Server1]  Exception tcpListener.Start():\r\n" + ex.ToString());
+                LogManager.DefaultLogger.Error("TCPIP -> Server4]  Exception tcpListener.Start():\r\n" + ex.ToString());
             }
 
             while (!IsStopped)
@@ -92,20 +91,20 @@ namespace BiometricServer
                 try
                 {
                     var tcpClient = await tcpListener.AcceptTcpClientAsync();
-                    LogManager.DefaultLogger.Info("[TCPIP -> Server1] DB-Matik Client has connected");
+                    LogManager.DefaultLogger.Info("TCPIP -> Server4] DB-Matik Client has connected");
 
                     var task = StartHandleConnectionAsync(tcpClient);
 
                     // if already faulted, re-throw any error on the calling context
                     if (task.IsFaulted)
                     {
-                        LogManager.DefaultLogger.Error("[TCPIP -> Server1] if (task.IsFaulted) entered");
+                        LogManager.DefaultLogger.Error("TCPIP -> Server4] if (task.IsFaulted) entered");
                         await task;
                     }
                 }
                 catch(Exception)
                 {
-                    //LogManager.DefaultLogger.Info("[TCPIP -> Server1] Exception2:\r\n" + ex.ToString());
+                    //LogManager.DefaultLogger.Info("TCPIP -> Server4] Exception2:\r\n" + ex.ToString());
                 }
             }
         }
@@ -127,7 +126,7 @@ namespace BiometricServer
             catch (Exception ex)
             {
                 // log the error
-                LogManager.DefaultLogger.Error("[TCPIP -> Server1] Exception1:\r\n" + ex.ToString());
+                LogManager.DefaultLogger.Error("TCPIP -> Server4] Exception1:\r\n" + ex.ToString());
 
                 // stop worker 
                 IsStopped = true;
@@ -166,7 +165,7 @@ namespace BiometricServer
 
                         if (byteCount > 2)
                         {
-                            LogManager.DefaultLogger.Info("[TCPIP -> Server1] Client wrote:\r\n" + request);
+                            LogManager.DefaultLogger.Info("TCPIP -> Server4] Client wrote:\r\n" + request);
 
                             S_Request.Enqueue(request);
                             Ack_Answer.Enqueue(request);
@@ -178,7 +177,7 @@ namespace BiometricServer
                                 Thread.Sleep(100);
                                 var serverResponseBytes = Encoding.UTF8.GetBytes(PrepareEvtAck(Ack_Answer));
                                 await networkStream.WriteAsync(serverResponseBytes, 0, serverResponseBytes.Length);
-                                LogManager.DefaultLogger.Info("[TCPIP -> Server1] ACK Response has been written");
+                                LogManager.DefaultLogger.Info("TCPIP -> Server4] ACK Response has been written");
                             }
                          }
                     }
@@ -191,185 +190,6 @@ namespace BiometricServer
         // TCPIP Server part END
 
 
-        //----------------------------------------------------------------
-        public async Task StartClient()
-        //----------------------------------------------------------------
-        {
-            // TCP/IP CLIENT CHANNEL = Send requests to DB-Matik
-
-            int timeOut = 2000;
-            int port = int.Parse(ReadSetting("REMOTE_PORT"));
-            string ip = ReadSetting("REMOTE_IP");
-
-            bool OfflineInfoLogged = false;
-
-            while (true)
-            {
-                if (_clientInterface != null && !IsStopped)
-                {
-                    if (CheckClientIsConnected() == true)
-                    {
-                        OfflineInfoLogged = false;
-                        await Task.Delay(1000);
-                        continue;
-                    }
-                }
-
-                using (TcpClient client = new TcpClient())
-                {
-                    var ca = client.ConnectAsync(ip, port);
-                    await Task.WhenAny(ca, Task.Delay(timeOut));
-                    client.Close();
-                    client.Dispose();
-
-                    if (ca.IsFaulted || !ca.IsCompleted)
-                    {
-                        if (OfflineInfoLogged == false)
-                        {
-                            OfflineInfoLogged = true;
-                            LogManager.DefaultLogger.Info("Remote DB-Matik Server on Production Equipment offline");
-                        }
-                    }
-                    else
-                    {
-                        OfflineInfoLogged = false;
-                        LogManager.DefaultLogger.Info("Remote DB-Matik Server on Production Equipment available");
-                        StartClientInternal();
-                    }
-                }
-
-                // Wait 1 second before trying the test again
-                await Task.Delay(1000);
-            }
-        }
-
-        //----------------------------------------------------------------
-        private void StartClientInternal()
-        //----------------------------------------------------------------
-        {
-            // TCP/IP CLIENT CHANNEL = Send requests to DB-Matik
-
-            int port = int.Parse(ReadSetting("REMOTE_PORT"));
-            string ip = ReadSetting("REMOTE_IP");
-
-            try
-            {
-                _clientInterface = new TcpClient();
-                var result = _clientInterface.BeginConnect(ip, port, null, null);
-                var success = result.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(5));
-
-                if (!success)
-                {
-                    throw new Exception("Equipment connection failed for IP = " + ip + " PORT = " + port.ToString());
-                }
-
-                // we have connected
-                _clientInterface.EndConnect(result);
-            }
-            catch (Exception ex)
-            {
-                LogManager.DefaultLogger.Error("StartClientInternal Exception:\r\n" + ex.ToString());
-            }
-        }
-
-        //----------------------------------------------------------------
-        public bool CheckClientIsConnected()
-        //----------------------------------------------------------------
-        {
-            // TCP/IP CLIENT CHANNEL = Send requests to DB-Matik
-
-            IPGlobalProperties ipProperties = IPGlobalProperties.GetIPGlobalProperties();
-
-            TcpConnectionInformation[] tcpConnections = ipProperties.GetActiveTcpConnections().Where(x => x.LocalEndPoint.Equals(_clientInterface.Client.LocalEndPoint) && x.RemoteEndPoint.Equals(_clientInterface.Client.RemoteEndPoint)).ToArray();
-
-            if (tcpConnections != null && tcpConnections.Length > 0)
-            {
-                TcpState stateOfConnection = tcpConnections.First().State;
-
-                if (stateOfConnection == TcpState.Established)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-            //_clientInterface.Close();
-
-            return false;
-        }
-
-        //----------------------------------------------------------------
-        public bool SendCommand(string command)
-        //----------------------------------------------------------------
-        {
-            // TCP/IP CLIENT CHANNEL = Send requests to DB-Matik
-
-            lock (lockMessageSend)
-            {
-                LogManager.DefaultLogger.Info("SendCommand:\r\n" + command);
-
-                if (_clientInterface == null)
-                {
-                    LogManager.DefaultLogger.Info("Remote DB-Matik Server on Production Equipment offline -> can not send");
-                    return false;
-                }
-
-                try
-                {
-                    SendMessageInternal(command);
-                }
-                catch (Exception ex)
-                {
-                    LogManager.DefaultLogger.Error("SendMessageInternal Exception:\r\n" + ex.ToString());
-                    return false;
-                }
-
-                string result = ReadResultInternal();
-
-                while (!result.Contains("</CmdAck>"))
-                {
-                    Thread.Sleep(100);
-                    result = result + ReadResultInternal();
-                }
-
-                LogManager.DefaultLogger.Info("SendCommand received ACK:\r\n" + result);
-            }
-
-            return true;
-        }
-
-        //----------------------------------------------------------------
-        private void SendMessageInternal(string message)
-        //----------------------------------------------------------------
-        {
-            byte[] commandBytes = Encoding.UTF8.GetBytes(message);
-            _clientInterface.GetStream().Write(commandBytes, 0, commandBytes.Length);
-        }
-
-        //----------------------------------------------------------------
-        private String ReadResultInternal()
-        //----------------------------------------------------------------
-        {
-            byte[] buffer = new byte[65535];
-
-            NetworkStream networkStream = _clientInterface.GetStream();
-            networkStream.ReadTimeout = 10000;
-
-            try
-            {
-                int amount = networkStream.Read(buffer, 0, buffer.Length);
-                string resultData = Encoding.UTF8.GetString(buffer, 0, amount);
-                return resultData;
-            }
-            catch (IOException ex)
-            {
-                LogManager.DefaultLogger.Info("ReadResultInternal Exception:\r\n" + ex.ToString());
-                return "Exception while waiting on answer but did ->  </CmdAck>";
-            }
-        }
 
         //----------------------------------------------------------------
         private void HandleSetVariablesResponse(string request)
@@ -2851,11 +2671,6 @@ namespace BiometricServer
         {
             IsStopped = true;
 
-            if(_clientInterface != null)
-            {
-                _clientInterface.Close();
-            }
-
             StopListener();
 
             if (WorkerThread != null)
@@ -2958,7 +2773,7 @@ namespace BiometricServer
                         RequestCompletet = String.Empty;
                     }
 
-                    LogManager.DefaultLogger.Info("[Worker1] Client wrote:\r\n" + Request);
+                    LogManager.DefaultLogger.Info("[Worker4] Client wrote:\r\n" + Request);
                 }
                 else
                 {
@@ -3310,7 +3125,7 @@ namespace BiometricServer
 
             try
             {
-                string result = appSettings[key] ?? "Not Found";
+                string result = appSettings[key] ?? "Not Found 4";
                 return result;
             }
             catch (ConfigurationErrorsException)

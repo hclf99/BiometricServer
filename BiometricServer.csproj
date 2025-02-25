@@ -105,6 +105,9 @@
     <Compile Include="CIM.cs" />
     <Compile Include="CMyCimetrix.cs" />
     <Compile Include="Ethernet.cs" />
+    <Compile Include="Ethernet2.cs" />
+    <Compile Include="Ethernet3.cs" />
+    <Compile Include="Ethernet4.cs" />
     <Compile Include="LogManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

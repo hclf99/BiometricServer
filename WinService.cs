@@ -24,9 +24,13 @@ namespace BiometricServer
 
         private SQLiteConnection conn;
 
-        private CS cs = new CS();
+        private CS1 cs1 = new CS1();
+        private CS2 cs2 = new CS2();
+        private CS3 cs3 = new CS3();
+        private CS4 cs4 = new CS4();
 
         private Mutex mutex = new Mutex();
+        private Mutex ethernetMutex = new Mutex();
 
         private readonly object _lockValue = new object();
 
@@ -66,34 +70,80 @@ namespace BiometricServer
             }
 
             conn = SQLight.Connection;
-            cs.Init(conn);
+
+            cs1.Init(conn, ethernetMutex);
+            cs2.Init(conn, ethernetMutex);
+            cs3.Init(conn, ethernetMutex);
+            cs4.Init(conn, ethernetMutex);
 
             var t = new Thread(InitializationMTA) { Name = "CimetrixInitialization" };
             t.SetApartmentState(ApartmentState.MTA);
             t.Start();
 
+            int port1 = int.Parse(ReadSetting("SERVER_PORT1"));
+            int port2 = int.Parse(ReadSetting("SERVER_PORT2"));
+            int port3 = int.Parse(ReadSetting("SERVER_PORT3"));
+            int port4 = int.Parse(ReadSetting("SERVER_PORT4"));
+
             // Activate TCP/IP server channel
             try
             {
-                _ = cs.StartListener();
+                _ = cs1.StartListener();
             }
             catch (Exception ex)
             {
-                LogManager.DefaultLogger.Info("TCPIP processor exception\r\n" + ex.Message);
+                LogManager.DefaultLogger.Info("TCPIP processor exception on C1 \r\n" + ex.Message);
             }
 
             // Activate TCP/IP client channel
             try
             {
-                _ = cs.StartClient();
+                _ = cs1.StartClient();
             }
             catch (Exception ex)
             {
                 LogManager.DefaultLogger.Info("TCPIP client exception\r\n" + ex.Message);
             }
 
+            if (port2 != 0)
+            {
+                try
+                {
+                    _ = cs2.StartListener();
+                }
+                catch (Exception ex)
+                {
+                    LogManager.DefaultLogger.Info("TCPIP processor exception on C2 \r\n" + ex.Message);
+                }
+            }
+
+
+            if (port3 != 0)
+            {
+                try
+                {
+                    _ = cs3.StartListener();
+                }
+                catch (Exception ex)
+                {
+                    LogManager.DefaultLogger.Info("TCPIP processor exception on C3 \r\n" + ex.Message);
+                }
+            }
+
+            if (port4 != 0)
+            {
+                try
+                {
+                    _ = cs4.StartListener();
+                }
+                catch (Exception ex)
+                {
+                    LogManager.DefaultLogger.Info("TCPIP processor exception on C4 \r\n" + ex.Message);
+                }
+            }
+
             LogManager.DefaultLogger.Info("==============================================================");
-            LogManager.DefaultLogger.Info("Biometric Server (1.14 BETA) wurde gestartet");
+            LogManager.DefaultLogger.Info("Biometric Server (2.0 BETA) wurde gestartet");
             LogManager.DefaultLogger.Info("SQLight: Database Verbindung geöffnet");
             LogManager.DefaultLogger.Info("CimetrixInitialization wurde gestarted");
             LogManager.DefaultLogger.Info("TCP/IP Processor wurde gestartet");
@@ -209,7 +259,10 @@ namespace BiometricServer
                     _CMyCimetrix.Shutdown();
 
                 // shutdown TCP/IP
-                cs.StopAndWait();
+                cs1.StopAndWait();
+                cs2.StopAndWait();
+                cs3.StopAndWait();
+                cs4.StopAndWait();
 
                 SQLight.Close();
 
@@ -327,7 +380,10 @@ namespace BiometricServer
                     _CMyCimetrix.Shutdown();
 
                 // shutdown TCP/IP
-                cs.StopAndWait();
+                cs1.StopAndWait();
+                cs2.StopAndWait();
+                cs3.StopAndWait();
+                cs4.StopAndWait();
 
                 SQLight.Close();
 
@@ -686,7 +742,7 @@ namespace BiometricServer
                             LogManager.DefaultLogger.Info("SQL:\r\n" + sql);
                         }
 
-                        cs.SendCommand(txt);
+                        cs1.SendCommand(txt);
                     }
                 }
                 catch (Exception ex)
@@ -788,7 +844,7 @@ namespace BiometricServer
                             LogManager.DefaultLogger.Info("SQL:\r\n" + sql);
                         }
 
-                        cs.SendCommand(txt);
+                        cs1.SendCommand(txt);
                         Thread.Sleep(300);
                     }
                 }
@@ -1580,7 +1636,7 @@ namespace BiometricServer
                 string txt = sw.ToString();
                 txt = txt.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>", "");
                 LogManager.DefaultLogger.Info("Send ExecuteRemoteCommand");
-                cs.SendCommand(txt);
+                cs1.SendCommand(txt);
             }
         }
 
@@ -1612,7 +1668,7 @@ namespace BiometricServer
                 string txt = sw.ToString();
                 txt = txt.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>", "");
                 LogManager.DefaultLogger.Info("Send GetProducts");
-                cs.SendCommand(txt);
+                cs1.SendCommand(txt);
             }
         }
 
@@ -1650,7 +1706,7 @@ namespace BiometricServer
                 string txt = sw.ToString();
                 txt = txt.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>", "");
                 LogManager.DefaultLogger.Info("Send SelectProduct");
-                cs.SendCommand(txt);
+                cs1.SendCommand(txt);
             }
         }
 
@@ -1688,7 +1744,7 @@ namespace BiometricServer
                 string txt = sw.ToString();
                 txt = txt.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>", "");
                 LogManager.DefaultLogger.Info("Send DownloadProduct");
-                cs.SendCommand(txt);
+                cs1.SendCommand(txt);
             }
         }
 
@@ -1728,7 +1784,7 @@ namespace BiometricServer
                 string txt = sw.ToString();
                 txt = txt.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>", "");
                 LogManager.DefaultLogger.Info("Send UploadProduct");
-                cs.SendCommand(txt);
+                cs1.SendCommand(txt);
             }
         }
 
@@ -1768,7 +1824,7 @@ namespace BiometricServer
                 string txt = sw.ToString();
                 txt = txt.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>", "");
                 LogManager.DefaultLogger.Info("Send RenameProduct");
-                cs.SendCommand(txt);
+                cs1.SendCommand(txt);
             }
         }
 
@@ -1834,7 +1890,7 @@ namespace BiometricServer
                 string txt = sw.ToString();
                 txt = txt.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>", "");
                 LogManager.DefaultLogger.Info("Send SetTerminalMessage");
-                cs.SendCommand(txt);
+                cs1.SendCommand(txt);
             }
         }
 
@@ -1892,7 +1948,7 @@ namespace BiometricServer
                 string txt = sw.ToString();
                 txt = txt.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>", "");
                 LogManager.DefaultLogger.Info("Send SetTerminalMessage");
-                cs.SendCommand(txt);
+                cs1.SendCommand(txt);
             }
         }
 
@@ -1923,7 +1979,7 @@ namespace BiometricServer
                 string txt = sw.ToString();
                 txt = txt.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>", "");
                 LogManager.DefaultLogger.Info("Send GetUsers");
-                cs.SendCommand(txt);
+                cs1.SendCommand(txt);
             }
         }
 
@@ -1954,7 +2010,7 @@ namespace BiometricServer
                 string txt = sw.ToString();
                 txt = txt.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>", "");
                 LogManager.DefaultLogger.Info("Send GetLoggedInUsers");
-                cs.SendCommand(txt);
+                cs1.SendCommand(txt);
             }
         }
 
@@ -2034,7 +2090,7 @@ namespace BiometricServer
                 string txt = sw.ToString();
                 txt = txt.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>", "");
                 LogManager.DefaultLogger.Info("Send CreateLot");
-                cs.SendCommand(txt);
+                cs1.SendCommand(txt);
             }
         }
 
@@ -2106,7 +2162,7 @@ namespace BiometricServer
                 txt = txt.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>", "");
                 LogManager.DefaultLogger.Info("Send CreateLot");
 
-                if (cs.SendCommand(txt) == false)
+                if (cs1.SendCommand(txt) == false)
                     return false;
             }
 
@@ -2166,7 +2222,7 @@ namespace BiometricServer
                 string txt = sw.ToString();
                 txt = txt.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>", "");
                 LogManager.DefaultLogger.Info("Send UpdateLot");
-                cs.SendCommand(txt);
+                cs1.SendCommand(txt);
             }
         }
 
@@ -2208,7 +2264,7 @@ namespace BiometricServer
                 string txt = sw.ToString();
                 txt = txt.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>", "");
                 LogManager.DefaultLogger.Info("Send GetLot");
-                cs.SendCommand(txt);
+                cs1.SendCommand(txt);
             }
         }
 
@@ -2240,7 +2296,7 @@ namespace BiometricServer
                 string txt = sw.ToString();
                 txt = txt.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>", "");
                 LogManager.DefaultLogger.Info("Send GetLots");
-                cs.SendCommand(txt);
+                cs1.SendCommand(txt);
             }
         }
 
@@ -2282,7 +2338,7 @@ namespace BiometricServer
                 string txt = sw.ToString();
                 txt = txt.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>", "");
                 LogManager.DefaultLogger.Info("Send DeleteLot");
-                cs.SendCommand(txt);
+                cs1.SendCommand(txt);
             }
         }
 
@@ -2331,7 +2387,7 @@ namespace BiometricServer
 
                 string txt = sw.ToString();
                 txt = txt.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>", "");
-                cs.SendCommand(txt);
+                cs1.SendCommand(txt);
             }
         }
 
@@ -2372,7 +2428,7 @@ namespace BiometricServer
 
                 string txt = sw.ToString();
                 txt = txt.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>", "");
-                cs.SendCommand(txt);
+                cs1.SendCommand(txt);
             }
         }
 
@@ -2413,7 +2469,7 @@ namespace BiometricServer
 
                 string txt = sw.ToString();
                 txt = txt.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>", "");
-                cs.SendCommand(txt);
+                cs1.SendCommand(txt);
             }
         }
 
@@ -2454,7 +2510,7 @@ namespace BiometricServer
 
                 string txt = sw.ToString();
                 txt = txt.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>", "");
-                cs.SendCommand(txt);
+                cs1.SendCommand(txt);
             }
         }
 
@@ -2496,7 +2552,7 @@ namespace BiometricServer
 
                 string txt = sw.ToString();
                 txt = txt.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>", "");
-                cs.SendCommand(txt);
+                cs1.SendCommand(txt);
             }
         }
     }
