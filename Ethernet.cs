@@ -36,7 +36,7 @@ namespace BiometricServer
         private SQLiteConnection conn;
 
         private TcpClient _clientInterface = null;
-        private TcpListener tcpListener;
+        private TcpListener tcpListener = null;
 
         //----------------------------------------------------------------
         public void Init(SQLiteConnection connnection, Mutex ethernetMutex)
@@ -55,10 +55,9 @@ namespace BiometricServer
         {
             // TCP/IP SERVER CHANNEL = Event processing from DB-Matik
 
-            LogManager.DefaultLogger.Info("[TCPIP -> Server1] stopping Listener 1");
-
             if (tcpListener != null)
             {
+                LogManager.DefaultLogger.Info("[TCPIP -> Server1] stopping Listener 1");
                 tcpListener.Stop();
             }
         }
