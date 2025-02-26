@@ -724,7 +724,8 @@ namespace BiometricServer
                 {
                     rdr.Read();
                     string name = rdr.GetString(0);
-                    CIM.AlarmSET(name, Text);
+                    string txt = ModuleName + ": " + Text;
+                    CIM.AlarmSET(name, txt);
                 }
                 rdr.Dispose();
                 cmd.Dispose();
@@ -775,7 +776,7 @@ namespace BiometricServer
                 {
                     rdr.Read();
                     string name = rdr.GetString(0);
-                    string txt = ModuleName + ": " + Response;
+                    string txt = ModuleName + ": " + Text;
                     CIM.AlarmCLEAR(name, txt);
                 }
                 rdr.Dispose();
