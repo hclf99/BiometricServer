@@ -143,7 +143,7 @@ namespace BiometricServer
             }
 
             LogManager.DefaultLogger.Info("==============================================================");
-            LogManager.DefaultLogger.Info("Biometric Server (2.0 BETA) wurde gestartet");
+            LogManager.DefaultLogger.Info("Biometric Server (2.1 BETA) wurde gestartet");
             LogManager.DefaultLogger.Info("SQLight: Database Verbindung geöffnet");
             LogManager.DefaultLogger.Info("CimetrixInitialization wurde gestarted");
             LogManager.DefaultLogger.Info("TCP/IP Processor wurde gestartet");
@@ -1479,6 +1479,7 @@ namespace BiometricServer
                 _CMyCimetrix._CxClientClerk.RegisterCommandHandler("GetModuleProcessStates", ref commandDescription, _CMyCimetrix);
 
                 _CMyCimetrix.InitializeFinal();
+                _CMyCimetrix.GEMStateControlStateRemote(_PrimaryConnection, true);
             }
             catch (Exception ex)
             {

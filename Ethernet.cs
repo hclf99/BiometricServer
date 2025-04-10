@@ -2049,14 +2049,14 @@ namespace BiometricServer
         {
             mutex.WaitOne();
 
+            string ItemId = "NULL", ModuleID = "NULL", ModuleName = "NULL", ShiftRegisterPos = "NULL", Items = "NULL";
+
             try
             {
                 var requestXml = XElement.Parse(request);
                 var EquipID = requestXml.Attribute("EquipID").Value;
                 var EvtSeqID = requestXml.Attribute("EvtSeqID").Value;
                 var SeqID = requestXml.Attribute("SeqID").Value;
-
-                string ShiftRegisterPos = "NULL";
 
                 var items = requestXml.Descendants("Item")
                                .Select(node => node.ToString())
@@ -2074,19 +2074,18 @@ namespace BiometricServer
                                       ItemId = x.Element("ItemID"),
                                       ModuleID = x.Element("ModuleID"),
                                       ModuleName = x.Element("ModuleName"),
-                                      TrackingNumber = x.Element("TrackingNumber"),
                                       ShiftRegisterPos = x.Element("ShiftRegisterPos"),
+                                      Items = x.Element("Items"),
                                   }).ToArray(); ;
 
-                    string ItemId = "NULL", ModuleID = "NULL", ModuleName = "NULL", TrackingNumber = "NULL";
 
                     foreach (var item2 in items2)
                     {
                         ItemId = item2.ItemId.Value;
                         ModuleID = item2.ModuleID.Value;
                         ModuleName = item2.ModuleName.Value;
-                        TrackingNumber = item2.TrackingNumber.Value;
                         ShiftRegisterPos = item2.ShiftRegisterPos.Value;
+                        Items = item2.Items.Attribute("Count").Value.ToString();
                         break;
                     }
                 }
@@ -2112,15 +2111,14 @@ namespace BiometricServer
         {
             mutex.WaitOne();
 
+            string ItemId = "NULL", ModuleID = "NULL", ModuleName = "NULL", ShiftRegisterPos = "NULL", Items = "NULL", ResultData = "NULL";
+
             try
             {
                 var requestXml = XElement.Parse(request);
                 var EquipID = requestXml.Attribute("EquipID").Value;
                 var EvtSeqID = requestXml.Attribute("EvtSeqID").Value;
                 var SeqID = requestXml.Attribute("SeqID").Value;
-
-                string ShiftRegisterPos = "NULL";
-
 
                 var items = requestXml.Descendants("Item")
                                .Select(node => node.ToString())
@@ -2138,24 +2136,20 @@ namespace BiometricServer
                                       ItemId = x.Element("ItemID"),
                                       ModuleID = x.Element("ModuleID"),
                                       ModuleName = x.Element("ModuleName"),
-                                      TrackingNumber = x.Element("TrackingNumber"),
                                       ShiftRegisterPos = x.Element("ShiftRegisterPos"),
-                                      Result = x.Element("Result"),
                                       ResultData = x.Element("ResultData"),
+                                      Items = x.Element("Items"),
                                   }).ToArray(); ;
 
-                    string ItemId = "NULL", ModuleID = "NULL", ModuleName = "NULL",
-                        TrackingNumber = "NULL", Result = "NULL", ResultData = "NULL";
 
                     foreach (var item2 in items2)
                     {
                         ItemId = item2.ItemId.Value;
                         ModuleID = item2.ModuleID.Value;
                         ModuleName = item2.ModuleName.Value;
-                        TrackingNumber = item2.TrackingNumber.Value;
                         ShiftRegisterPos = item2.ShiftRegisterPos.Value;
-                        Result = item2.Result.Value;
                         ResultData = item2.ResultData.Value;
+                        Items = item2.Items.Attribute("Count").Value.ToString();
                         break;
                     }
                 }
@@ -2813,26 +2807,25 @@ namespace BiometricServer
                     Type = item.Type;
                     DataType = item.DataType;
                     Val = item.val;
+
+                    var dataNames = new string[]
+                    {
+                        "VariableChanged_Name",
+                        "VariableChanged_ObjectType",
+                        "VariableChanged_DataType",
+                        "VariableChanged_Value",
+                    };
+
+                    var dataValues = new CxValue[]
+                    {
+                        new AValue(Name),
+                        new AValue(Type),
+                        new AValue(DataType),
+                        new AValue(Val),
+                    };
+                    
+                    CIM.SendCollectionEventWithData(dataNames, dataValues, "VariableChanged");
                 }
-
-                var dataNames = new string[]
-                {
-                    "VariableChanged_Name",
-                    "VariableChanged_ObjectType",
-                    "VariableChanged_DataType",
-                    "VariableChanged_Value",
-                };
-
-                var dataValues = new CxValue[]
-                {
-                    new AValue(Name),
-                    new AValue(Type),
-                    new AValue(DataType),
-                    new AValue(Val),
-                };
-
-                CIM.SendCollectionEventWithData(dataNames, dataValues, "VariableChanged");
-
             }
             catch (Exception ex)
             {
