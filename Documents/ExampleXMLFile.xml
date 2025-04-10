@@ -1,0 +1,121 @@
+﻿<otto>
+
+<Cmd ID="GetVariables" EquipID="[EQUIPMENTID]" CmdSeqID="[CMDSEQID]" SeqID="[SEQID]">
+	<Variable ID="[VARIABLEID]" Name="[VARIABLENAME]"/>
+	<Variable ID="[VARIABLEID]" Name="[VARIABLENAME]"/>
+	<Variable ID="[VARIABLEID]" Name="[VARIABLENAME]"/>
+</Cmd>
+
+<Evt ID="GetVariablesResponse" EquipID="[EQUIPMENTID]" EvtSeqID="[EVTSEQID]" SeqID="[SEQID]">
+	<Variable ID="[VARIABLEID]" Name="[VARIABLENAME]" Type="[VARIABLETYPE]"	UnitID="[UNITID]" Unit="[UNIT]"	DataTypeID="[DATATYPEID]" DataType="[DATATYPE]">[VALUE]	</Variable>
+	<Variable ID="[VARIABLEID]" Name="[VARIABLENAME]" Type="[VARIABLETYPE]"	UnitID="[UNITID]" Unit="[UNIT]"	DataTypeID="[DATATYPEID]" DataType="[DATATYPE]">[VALUE]	</Variable>
+	<Variable ID="[VARIABLEID]" Name="[VARIABLENAME]" Type="[VARIABLETYPE]"	UnitID="[UNITID]" Unit="[UNIT]"	DataTypeID="[DATATYPEID]" DataType="[DATATYPE]">[VALUE]	</Variable>
+	<Variable ID="[VARIABLEID]" Name="[VARIABLENAME]" Type="[VARIABLETYPE]"	UnitID="[UNITID]" Unit="[UNIT]"	DataTypeID="[DATATYPEID]" DataType="[DATATYPE]">[VALUE]	</Variable>
+</Evt>
+
+<Evt ID="VariableChanged" EquipID="[EQUIPMENTID]" EvtSeqID="[EVTSEQID]">
+	<Variable ID="[VARIABLEID]" Name="[VARIABLENAME]" Type="[VARIABLETYPE]" UnitID="[UNITID]" Unit="[UNIT]" DataTypeID="[DATATYPEID]" DataType="[DATATYPE]"	User="[USERNAME]">	[VALUE]	</Variable>
+	<Variable ID="[VARIABLEID]" Name="[VARIABLENAME]" Type="[VARIABLETYPE]" UnitID="[UNITID]" Unit="[UNIT]" DataTypeID="[DATATYPEID]" DataType="[DATATYPE]"	User="[USERNAME]">	[VALUE]	</Variable>
+	<Variable ID="[VARIABLEID]" Name="[VARIABLENAME]" Type="[VARIABLETYPE]" UnitID="[UNITID]" Unit="[UNIT]" DataTypeID="[DATATYPEID]" DataType="[DATATYPE]"	User="[USERNAME]">	[VALUE]	</Variable>
+	<Variable ID="[VARIABLEID]" Name="[VARIABLENAME]" Type="[VARIABLETYPE]" UnitID="[UNITID]" Unit="[UNIT]" DataTypeID="[DATATYPEID]" DataType="[DATATYPE]"	User="[USERNAME]">	[VALUE]	</Variable>
+	<Variable ID="[VARIABLEID]" Name="[VARIABLENAME]" Type="[VARIABLETYPE]" UnitID="[UNITID]" Unit="[UNIT]" DataTypeID="[DATATYPEID]" DataType="[DATATYPE]"	User="[USERNAME]">	[VALUE]	</Variable>
+</Evt>
+//-------------------------------------------------------------------------------------
+
+
+<Evt ID="MaterialReceived" EquipID="[EQUIPMENTID]" EvtSeqID="[EVTSEQID]" SeqID="[SEQID]">
+	<Material>
+		<MaterialId>[MATERIALID]</MaterialId>
+		<MaterialName>[MATERIALNAME]</MaterialName>
+	</Material>
+	<ModuleId>=[MODULEID]</ModuleId>
+	<ModuleName>[MODULENAME]</ModuleName>
+	<TimeStamp>[TIMESTAMP]</TimeStamp>
+</Evt>
+
+<Evt ID="MaterialProcessed" EquipID="[EQUIPMENTID]" EvtSeqID="[EVTSEQID]" SeqID="[SEQID]">
+	<Material>
+		<MaterialId>[MATERIALID]</MaterialId>
+		<MaterialName>[MATERIALNAME]</MaterialName>
+	</Material>
+	<ModuleId>=[MODULEID]</ModuleId>
+	<ModuleName>[MODULENAME]</ModuleName>
+	<TimeStamp>[TIMESTAMP]</TimeStamp>
+</Evt>
+
+<Evt ID="MaterialRemoved" EquipID="[EQUIPMENTID]" EvtSeqID="[EVTSEQID]" SeqID="[SEQID]">
+	<Material>
+		<MaterialId>[MATERIALID]</MaterialId>
+		<MaterialName>[MATERIALNAME]</MaterialName>
+	</Material>
+	<ModuleId>=[MODULEID]</ModuleId>
+	<ModuleName>[MODULENAME]</ModuleName>
+	<TimeStamp>[TIMESTAMP]</TimeStamp>
+</Evt>
+
+//-------------------------------------------------------------------------------------
+	
+<Cmd ID="GetModuleProcessStates" EquipID="[EQUIPMENTID]" CmdSeqID="[CMDSEQID]" SeqID="[SEQID]">
+	<ModuleState ID="[MODULEID]" Name="[MODULENAME]"/>
+	<ModuleState ID="[MODULEID]" Name="[MODULENAME]"/>
+	<ModuleState ID="[MODULEID]" Name="[MODULENAME]"/>
+	<ModuleState ID="[MODULEID]" Name="[MODULENAME]"/>
+	<ModuleState ID="[MODULEID]" Name="[MODULENAME]"/>
+</Cmd>
+
+<Evt ID="GetModuleProcessStatesResponse" EquipID="[EQUIPMENTID]" EvtSeqID="[EVTSEQID]" SeqID="[SEQID]">
+	<ModuleState ID="[MODULEID]" Name="[MODULENAME]">[MODULESTATE] </ModuleState>
+	<ModuleState ID="[MODULEID]" Name="[MODULENAME]">[MODULESTATE] </ModuleState>
+	<ModuleState ID="[MODULEID]" Name="[MODULENAME]">[MODULESTATE] </ModuleState>
+	<ModuleState ID="[MODULEID]" Name="[MODULENAME]">[MODULESTATE] </ModuleState>
+	<ModuleState ID="[MODULEID]" Name="[MODULENAME]">[MODULESTATE] </ModuleState>
+</Evt>	
+	
+<Evt ID="ModuleProcessStateChanged" EquipID="[EQUIPMENTID]" EvtSeqID="[EVTSEQID]">
+	<ModuleState ID="[MODULEID]" Name="[MODULENAME]"> [MODULESTATE]	</ModuleState>
+	<ModuleState ID="[MODULEID]" Name="[MODULENAME]"> [MODULESTATE]	</ModuleState>
+	<ModuleState ID="[MODULEID]" Name="[MODULENAME]"> [MODULESTATE]	</ModuleState>
+	<ModuleState ID="[MODULEID]" Name="[MODULENAME]"> [MODULESTATE]	</ModuleState>
+</Evt>
+
+//-------------------------------------------------------------------------------------
+
+<Cmd ID="ExecuteRemoteCommand" EquipID="[EQUIPMENTID]" CmdSeqID="[CMDSEQID]" SeqID="[SEQID]">
+	<RemoteCmd ID="[REMOTECMDID]" Name="[REMOTECMDNAME]" ModuleID="[MODULEID]" ModuleName="[MODULENAME]"/>
+	<RemoteCmd ID="[REMOTECMDID]" Name="[REMOTECMDNAME]" ModuleID="[MODULEID]" ModuleName="[MODULENAME]"/>
+	<RemoteCmd ID="[REMOTECMDID]" Name="[REMOTECMDNAME]" ModuleID="[MODULEID]" ModuleName="[MODULENAME]"/>
+</Cmd>
+
+<Evt ID="ExecuteRemoteCommandResponse" EquipID="[EQUIPMENTID]" CmdSeqID="[CMDSEQID]" SeqID="[SEQID]"> 
+	<Result>[RESULT]</Result> 
+	<Error>[ERRORCODE]</Error> 
+	<TimeStamp>[TIMESTAMP]</TimeStamp>
+	<RemoteCmd ID="[REMOTECMDID]" Name="[REMOTECMDNAME]" ModuleID="[MODULEID]" ModuleName="[MODULENAME]"> [SUBRESULT] </RemoteCmd>
+</Evt>
+
+//-------------------------------------------------------------------------------------
+
+<Evt ID="AlarmSet" EquipID="[EQUIPMENTID]" EvtSeqID="[EVTSEQID]">
+	<Alarm>
+		<ID>99</ID>
+		<Text>Das ist ein AlarmSet </Text>
+		<ModuleID>4</ModuleID>
+		<ModuleName>Plasma</ModuleName>
+		<TimeStamp>20231231235959999</TimeStamp>
+	</Alarm>
+</Evt>
+
+<Evt ID="AlarmCleared" EquipID="[EQUIPMENTID]" EvtSeqID="[EVTSEQID]">
+	<Alarm>
+		<ID>99</ID>
+		<Text>Das ist ein AlarmSet </Text>
+		<ModuleID>4</ModuleID>
+		<ModuleName>Plasma</ModuleName>
+		<Response>OK</Response>
+		<TimeStamp>20231231235959999</TimeStamp>
+	</Alarm>
+</Evt>
+//-------------------------------------------------------------------------------------
+
+
+</otto>
