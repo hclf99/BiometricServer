@@ -20,6 +20,7 @@ using System.Net.NetworkInformation;
 using System.Text.RegularExpressions;
 using System.Reflection;
 using VALUELib;
+using System.ComponentModel.DataAnnotations;
 
 namespace BiometricServer
 {
@@ -2090,8 +2091,24 @@ namespace BiometricServer
                     }
                 }
 
-                var dataNames = new string[] { "ItemProcessStartedData" };
-                var dataValues = new CxValue[] { new AValue(ShiftRegisterPos) };
+                var dataNames = new string[]
+                {
+                        "Process_ItemId",
+                        "Process_ModuleID",
+                        "Process_ModuleName",
+                        "Process_ShiftRegisterPos",
+                        "Process_ItemsCount",
+                };
+
+                var dataValues = new CxValue[]
+                {
+                        new I4Value(Int32.Parse(ItemId)),
+                        new I4Value(Int32.Parse(ModuleID)),
+                        new AValue(ModuleName),
+                        new AValue(ShiftRegisterPos),
+                        new I4Value(Int32.Parse(Items)),
+                };
+
                 CIM.SendCollectionEventWithData(dataNames, dataValues, "ItemProcessStarted");
             }
             catch (Exception ex)
@@ -2154,8 +2171,26 @@ namespace BiometricServer
                     }
                 }
 
-                var dataNames = new string[] { "ItemProcessCompletedData" };
-                var dataValues = new CxValue[] { new AValue(ShiftRegisterPos) };
+                var dataNames = new string[]
+                {
+                        "Process_ItemId",
+                        "Process_ModuleID",
+                        "Process_ModuleName",
+                        "Process_ShiftRegisterPos",
+                        "Process_ItemsCount",
+                        "Process_ResultData",
+                };
+
+                var dataValues = new CxValue[]
+                {
+                        new I4Value(Int32.Parse(ItemId)),
+                        new I4Value(Int32.Parse(ModuleID)),
+                        new AValue(ModuleName),
+                        new AValue(ShiftRegisterPos),
+                        new I4Value(Int32.Parse(Items)),
+                        new AValue(ResultData),
+                };
+
                 CIM.SendCollectionEventWithData(dataNames, dataValues, "ItemProcessCompleted");
             }
             catch (Exception ex)
