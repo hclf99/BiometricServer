@@ -3,6 +3,7 @@ using EMSERVICELib;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Data.SQLite;
 using System.Diagnostics;
 using System.IO;
@@ -11,6 +12,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Xml;
 using Topshelf;
 
@@ -56,6 +58,7 @@ namespace BiometricServer
         ManualResetEvent _EventSTOP;
         bool _ProcessingThreadExit;
 
+        private static System.Timers.Timer aTimer;
 
         //----------------------------------------------------------------
         public void Start()
@@ -142,11 +145,23 @@ namespace BiometricServer
                 }
             }
 
+            aTimer = new System.Timers.Timer(1000 * 60 * 60);
+            aTimer.Elapsed += OnTimedEventInfo;
+            aTimer.AutoReset = true;
+            aTimer.Enabled = false;
+
             LogManager.DefaultLogger.Info("==============================================================");
-            LogManager.DefaultLogger.Info("Biometric Server 2.2 wurde gestartet");
+            LogManager.DefaultLogger.Info("Biometric Server 2.4 wurde gestartet");
             LogManager.DefaultLogger.Info("SQLight: Database Verbindung geöffnet");
             LogManager.DefaultLogger.Info("CimetrixInitialization wurde gestarted");
             LogManager.DefaultLogger.Info("TCP/IP Processor wurde gestartet");
+        }
+
+        //----------------------------------------------------------------
+        private void OnTimedEventInfo(Object source, ElapsedEventArgs e)
+        //----------------------------------------------------------------
+        {
+            RemoveOlderlogs();
         }
 
         //----------------------------------------------------------------
@@ -2554,6 +2569,34 @@ namespace BiometricServer
                 string txt = sw.ToString();
                 txt = txt.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>", "");
                 cs1.SendCommand(txt);
+            }
+        }
+
+
+        //----------------------------------------------------------------
+        private void RemoveOlderlogs()
+        //----------------------------------------------------------------
+        {
+            var files1 = new DirectoryInfo(Directory.GetCurrentDirectory()).GetFiles("Default_*.log");
+
+            foreach (var file in files1)
+            {
+                if (DateTime.UtcNow - file.CreationTimeUtc > TimeSpan.FromDays(2))
+                {
+                    File.Delete(file.FullName);
+                }
+            }
+
+            string LOGGERDIRECTORY = ReadSetting("LOGGERDIRECTORY");
+
+            var files3 = new DirectoryInfo(LOGGERDIRECTORY).GetFiles("*.log");
+
+            foreach (var file in files3)
+            {
+                if (DateTime.UtcNow - file.CreationTimeUtc > TimeSpan.FromDays(30))
+                {
+                    File.Delete(file.FullName);
+                }
             }
         }
     }

@@ -545,6 +545,13 @@ namespace BiometricServer
                     string name = rdr.GetString(0);
                     string txt = ModuleName + ": " + Text;
                     CIM.AlarmSET(name, txt);
+
+                    // Daten in File speichern
+                    string txtsave = "ALSET," + name + "," + txt + "\r\n";
+                    string DIRECTORY = ReadSetting("ALARMDIRECTORY"); ;
+
+                    string filePath = DIRECTORY + "\\" + "Alarms_" + DateTime.Now.ToString("dd-MM-yyyy") + ".log";
+                    File.AppendAllText(filePath, txtsave);
                 }
                 rdr.Dispose();
                 cmd.Dispose();
@@ -597,6 +604,13 @@ namespace BiometricServer
                     string name = rdr.GetString(0);
                     string txt = ModuleName + ": " + Response;
                     CIM.AlarmCLEAR(name, txt);
+
+                    // Daten in File speichern
+                    string txtsave = "ALCLEAR," + name + "," + txt + "\r\n";
+                    string DIRECTORY = ReadSetting("ALARMDIRECTORY"); ;
+
+                    string filePath = DIRECTORY + "\\" + "Alarms_" + DateTime.Now.ToString("dd-MM-yyyy") + ".log";
+                    File.AppendAllText(filePath, txtsave);
                 }
                 rdr.Dispose();
                 cmd.Dispose();
